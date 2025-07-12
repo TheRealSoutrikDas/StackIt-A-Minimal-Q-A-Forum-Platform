@@ -3,6 +3,16 @@ StackIt is a minimal question-and-answer platform that supports collaborative  l
 StackIt is a modern web app built with [Next.js 14](https://nextjs.org/) using the App Router, TypeScript, TailwindCSS, and Quill.js for rich text editing. It provides a clean interface for content creation and includes a responsive dashboard with metric cards.
 
 ---
+# Probelm statement
+StackIt – A Minimal Q&A Forum Platform 
+## Overview 
+StackIt is a minimal question-and-answer platform that supports collaborative 
+learning and structured knowledge sharing. It’s designed to be simple, user-friendly, 
+and focused on the core experience of asking and answering questions within a 
+community. 
+
+## Team Name: NaiveBaes
+---
 
 ## 🚀 Features
 
