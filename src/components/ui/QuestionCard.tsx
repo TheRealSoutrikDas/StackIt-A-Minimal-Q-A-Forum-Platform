@@ -145,18 +145,20 @@ export default function QuestionCard({
 		//     </div>
 		//   </div>
 		// </div>
-		<Card className="w-full max-w-sm">
-			<CardHeader>
-				<CardTitle>Card Title</CardTitle>
-				<CardDescription>Card Description</CardDescription>
-				<CardAction>Card Action</CardAction>
-			</CardHeader>
-			<CardContent>
-				<p>Card Content</p>
-			</CardContent>
-			<CardFooter>
-				<p>Card Footer</p>
-			</CardFooter>
-		</Card>
+		<div className="w-full p-4">
+			<Card>
+				<CardHeader>
+					<CardTitle>Card Title</CardTitle>
+					<CardDescription>Card Description</CardDescription>
+					<CardAction>Card Action</CardAction>
+				</CardHeader>
+				<CardContent>
+					<p>Card Content</p>
+				</CardContent>
+				<CardFooter>
+					<p>Card Footer</p>
+				</CardFooter>
+			</Card>
+		</div>
 	);
 }
