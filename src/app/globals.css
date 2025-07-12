@@ -3,72 +3,135 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+	--radius: 0.625rem;
+
+	--background: oklch(0.99 0 0);
+	--foreground: oklch(0.13 0 0);
+
+	--card: oklch(0.98 0 0);
+	--card-foreground: oklch(0.13 0 0);
+
+	--primary: oklch(0.25 0.02 20);
+	--primary-foreground: oklch(0.98 0 0);
+
+	--secondary: oklch(0.9 0 0);
+	--secondary-foreground: oklch(0.2 0 0);
+
+	--muted: oklch(0.93 0 0);
+	--muted-foreground: oklch(0.4 0 0);
+
+	--accent: oklch(0.9 0 0);
+	--accent-foreground: oklch(0.25 0 0);
+
+	--destructive: oklch(0.6 0.25 27);
+	--border: oklch(0.88 0 0);
+	--input: oklch(0.95 0 0);
+	--ring: oklch(0.7 0 0);
+
+	--shadow-color: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.dark {
+	--background: oklch(0.13 0 0);
+	--foreground: oklch(0.98 0 0);
+
+	--card: oklch(0.18 0 0);
+	--card-foreground: oklch(0.98 0 0);
+
+	--primary: oklch(0.8 0.03 240);
+	--primary-foreground: oklch(0.13 0 0);
+
+	--secondary: oklch(0.25 0 0);
+	--secondary-foreground: oklch(0.95 0 0);
+
+	--muted: oklch(0.22 0 0);
+	--muted-foreground: oklch(0.65 0 0);
+
+	--accent: oklch(0.25 0 0);
+	--accent-foreground: oklch(0.98 0 0);
+
+	--destructive: oklch(0.7 0.2 30);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 12%);
+	--ring: oklch(0.6 0 0);
+
+	--shadow-color: 0 1px 3px rgba(255, 255, 255, 0.08),
+		0 1px 2px rgba(255, 255, 255, 0.05);
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+	* {
+		border-color: hsl(var(--border));
+		outline-color: hsl(var(--ring));
+	}
+
+	body {
+		background-color: hsl(var(--background));
+		color: hsl(var(--foreground));
+		font-family: "Inter", sans-serif;
+	}
 }
 
-/* Rich Text Editor Styles */
+/* ProseMirror editor base */
 .ProseMirror {
-  outline: none;
-  min-height: 200px;
+	outline: none;
+	min-height: 200px;
+	padding: 0.75rem;
+	background: var(--card);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-color);
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
-  color: #adb5bd;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
+	color: #999;
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
 }
 
-/* Line clamp utilities */
+/* Line Clamp Utilities */
 .line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
-/* Custom scrollbar */
+/* Button Base */
+.btn {
+	padding: 6px 12px;
+	border: 1px solid var(--border);
+	background: var(--muted);
+	color: var(--foreground);
+	font-size: 14px;
+	cursor: pointer;
+	border-radius: var(--radius-sm);
+	transition: all 0.2s ease;
+}
+.btn:hover {
+	background: var(--accent);
+	color: var(--accent-foreground);
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+	width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+	background: var(--muted);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+	background: var(--border);
+	border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+	background: var(--ring);
 }
