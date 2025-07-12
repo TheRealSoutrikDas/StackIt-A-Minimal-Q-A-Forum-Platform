@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
 
 const registerSchema = z
 	.object({
@@ -153,7 +154,7 @@ export default function RegisterPage() {
 								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<User className="h-5 w-5 text-gray-400" />
 								</div>
-								<input
+								<Input
 									id="username"
 									name="username"
 									type="text"
@@ -166,7 +167,7 @@ export default function RegisterPage() {
 											e.target.value
 										)
 									}
-									className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+									className={`appearance-none block w-72 pl-12 sm:text-sm ${
 										errors.username
 											? "border-red-300"
 											: "border-gray-300"
@@ -192,7 +193,7 @@ export default function RegisterPage() {
 								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<Mail className="h-5 w-5 text-gray-400" />
 								</div>
-								<input
+								<Input
 									id="email"
 									name="email"
 									type="email"
@@ -205,7 +206,7 @@ export default function RegisterPage() {
 											e.target.value
 										)
 									}
-									className={`appearance-none block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+									className={`appearance-none block w-72 pl-12 sm:text-sm ${
 										errors.email
 											? "border-red-300"
 											: "border-gray-300"
@@ -231,7 +232,7 @@ export default function RegisterPage() {
 								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<Lock className="h-5 w-5 text-gray-400" />
 								</div>
-								<input
+								<Input
 									id="password"
 									name="password"
 									type={showPassword ? "text" : "password"}
@@ -244,27 +245,27 @@ export default function RegisterPage() {
 											e.target.value
 										)
 									}
-									className={`appearance-none block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+									className={`appearance-none block w-72 pl-12 sm:text-sm  ${
 										errors.password
 											? "border-red-300"
 											: "border-gray-300"
 									}`}
 									placeholder="Create a password"
 								/>
-								<div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-									<button
+								<div className="absolute inset-y-0 right-0 pr-10 flex items-center">
+									<Button
 										type="button"
 										onClick={() =>
 											setShowPassword(!showPassword)
 										}
-										className="text-gray-400 hover:text-gray-600"
+										className="border-none text-gray-400 bg-transparent hover:text-gray-800"
 									>
 										{showPassword ? (
 											<EyeOff className="h-5 w-5" />
 										) : (
 											<Eye className="h-5 w-5" />
 										)}
-									</button>
+									</Button>
 								</div>
 							</div>
 							{errors.password && (
@@ -289,7 +290,7 @@ export default function RegisterPage() {
 								<div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 									<Lock className="h-5 w-5 text-gray-400" />
 								</div>
-								<input
+								<Input
 									id="confirmPassword"
 									name="confirmPassword"
 									type={
@@ -306,29 +307,29 @@ export default function RegisterPage() {
 											e.target.value
 										)
 									}
-									className={`appearance-none block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
+									className={`appearance-none block w-72 pl-12 sm:text-sm ${
 										errors.confirmPassword
 											? "border-red-300"
 											: "border-gray-300"
 									}`}
 									placeholder="Confirm your password"
 								/>
-								<div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-									<button
+								<div className="absolute inset-y-0 right-0 pr-8 flex items-center">
+									<Button
 										type="button"
 										onClick={() =>
 											setShowConfirmPassword(
 												!showConfirmPassword
 											)
 										}
-										className="text-gray-400 hover:text-gray-600"
+										className="border-none bg-transparent text-gray-400 hover:text-gray-800"
 									>
 										{showConfirmPassword ? (
 											<EyeOff className="h-5 w-5" />
 										) : (
 											<Eye className="h-5 w-5" />
 										)}
-									</button>
+									</Button>
 								</div>
 							</div>
 							{errors.confirmPassword && (
@@ -364,12 +365,14 @@ export default function RegisterPage() {
 						</div>
 
 						<div className="mt-6">
-							<Link
-								href="/login"
-								className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-							>
-								Sign in to your account
-							</Link>
+							<Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+								<Link
+									href="/login"
+									style={{ textDecoration: "None" }}
+								>
+									Sign in to your account
+								</Link>
+							</Button>
 						</div>
 					</div>
 				</div>

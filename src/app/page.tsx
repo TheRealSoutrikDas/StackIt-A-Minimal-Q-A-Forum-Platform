@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import Navigation from "@/components/ui/Navigation";
 import QuestionCard from "@/components/ui/QuestionCard";
-import AskQuestionForm from "@/components/forms/AskQuestionForm";
+// import AskQuestionForm from "@/components/forms/AskQuestionForm";
 import { Question, Notification } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { questionsApi } from "@/lib/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 
 import "./globals.css";
+import Link from "next/link";
 
 // Mock notifications for demonstration (will be replaced with API calls)
 const mockNotifications: Notification[] = [
@@ -39,7 +40,7 @@ export default function HomePage() {
 	const { user: currentUser } = useAuth();
 	const [questions, setQuestions] = useState<Question[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [showAskForm, setShowAskForm] = useState(false);
+	// const [showAskForm, setShowAskForm] = useState(false);
 	const [notifications, setNotifications] =
 		useState<Notification[]>(mockNotifications);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -130,31 +131,31 @@ export default function HomePage() {
 		console.log("Notification clicked:", notification);
 	};
 
-	const handleAskQuestion = () => {
-		setShowAskForm(true);
-	};
+	// const handleAskQuestion = () => {
+	// 	setShowAskForm(true);
+	// };
 
-	const handleCancelAsk = () => {
-		setShowAskForm(false);
-	};
+	// const handleCancelAsk = () => {
+	// 	setShowAskForm(false);
+	// };
 
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
 	};
 
-	if (showAskForm) {
-		return (
-			<div className="min-h-screen bg-background text-foreground">
-				<Navigation
-					user={currentUser || undefined}
-					notifications={notifications}
-					onSearch={handleSearch}
-					onNotificationClick={handleNotificationClick}
-				/>
-				<AskQuestionForm onCancel={handleCancelAsk} />
-			</div>
-		);
-	}
+	// if (showAskForm) {
+	// 	return (
+	// 		<div className="min-h-screen bg-background text-foreground">
+	// 			<Navigation
+	// 				user={currentUser || undefined}
+	// 				notifications={notifications}
+	// 				onSearch={handleSearch}
+	// 				onNotificationClick={handleNotificationClick}
+	// 			/>
+	// 			<AskQuestionForm onCancel={handleCancelAsk} />
+	// 		</div>
+	// 	);
+	// }
 
 	return (
 		<div className="min-h-screen bg-background text-foreground">
@@ -179,11 +180,12 @@ export default function HomePage() {
 						</p>
 					</div>
 					<Button
-						onClick={handleAskQuestion}
 						variant="default"
 						className="rounded-lg px-5 py-2.5 text-base font-semibold shadow-sm hover:scale-105 transition"
 					>
-						Ask Question
+						<Link href="/ask" style={{ textDecoration: "None" }}>
+							Ask Question
+						</Link>
 					</Button>
 				</div>
 
