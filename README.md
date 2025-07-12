@@ -11,7 +11,7 @@ learning and structured knowledge sharing. It’s designed to be simple, user-fr
 and focused on the core experience of asking and answering questions within a 
 community. 
 
-## Team Name: NaiveBaes
+## Team : Team 0849
 ---
 
 ## 🚀 Features
