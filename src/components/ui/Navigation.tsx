@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Search, User, Menu, X } from "lucide-react";
+import { Bell, Search, User, Menu, X, LogOut } from "lucide-react";
 import { User as UserType, Notification } from "@/lib/types";
 import { Button } from "./button";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavigationProps {
 	user?: UserType;
@@ -19,9 +20,14 @@ export default function Navigation({
 	onSearch,
 	onNotificationClick,
 }: NavigationProps) {
+	const { user: authUser, logout } = useAuth();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+	// Use auth user if no user prop is provided
+	const currentUser = user || authUser;
 
 	const unreadNotifications = notifications.filter((n) => !n.isRead);
 
@@ -33,6 +39,15 @@ export default function Navigation({
 	const handleNotificationClick = (notification: Notification) => {
 		onNotificationClick?.(notification);
 		setIsNotificationOpen(false);
+	};
+
+	const handleLogout = async () => {
+		try {
+			await logout();
+			setIsUserMenuOpen(false);
+		} catch (error) {
+			console.error("Logout error:", error);
+		}
 	};
 
 	return (
@@ -156,23 +171,75 @@ export default function Navigation({
 						</div>
 
 						{/* User Menu */}
-						{user ? (
+						{currentUser ? (
 							<div className="relative">
-								<button className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+								<button
+									onClick={() =>
+										setIsUserMenuOpen(!isUserMenuOpen)
+									}
+									className="flex items-center space-x-2 p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+								>
 									<User className="h-6 w-6" />
 									<span className="hidden md:block text-sm font-medium text-gray-700">
-										{user.username}
+										{currentUser.username}
 									</span>
 								</button>
+
+								{/* User Dropdown */}
+								{isUserMenuOpen && (
+									<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+										<div className="py-1">
+											<Link
+												href="/profile"
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+												onClick={() =>
+													setIsUserMenuOpen(false)
+												}
+											>
+												Profile
+											</Link>
+											<Link
+												href="/settings"
+												className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+												onClick={() =>
+													setIsUserMenuOpen(false)
+												}
+											>
+												Settings
+											</Link>
+											<button
+												onClick={handleLogout}
+												className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											>
+												<div className="flex items-center">
+													<LogOut className="h-4 w-4 mr-2" />
+													Logout
+												</div>
+											</button>
+										</div>
+									</div>
+								)}
 							</div>
 						) : (
 							<div className="flex items-center space-x-2">
-								<button className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-									Log in
-								</button>
-								<button className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
-									Sign up
-								</button>
+								<Button className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+									<Link
+										style={{ textDecoration: "none" }}
+										// className="text-white"
+										href="/login"
+									>
+										Log in
+									</Link>
+								</Button>
+								<Button className="bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+									<Link
+										style={{ textDecoration: "none" }}
+										className="text-white"
+										href="/register"
+									>
+										Sign up
+									</Link>
+								</Button>
 							</div>
 						)}
 
@@ -206,15 +273,30 @@ export default function Navigation({
 							<button className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
 								Ask Question
 							</button>
-							{!user && (
+							{!currentUser && (
 								<>
-									<button className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
-										Log in
-									</button>
-									<button className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
-										Sign up
-									</button>
+									<Link href="/login">
+										<button className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+											Log in
+										</button>
+									</Link>
+									<Link href="/register">
+										<button className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
+											Sign up
+										</button>
+									</Link>
 								</>
+							)}
+							{currentUser && (
+								<button
+									onClick={handleLogout}
+									className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+								>
+									<div className="flex items-center">
+										<LogOut className="h-4 w-4 mr-2" />
+										Logout
+									</div>
+								</button>
 							)}
 						</div>
 					</div>

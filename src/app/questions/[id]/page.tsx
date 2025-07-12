@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
 import { Question, User, Notification } from "@/lib/types";
 import { questionsApi, answersApi } from "@/lib/api-client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
 	ThumbsUp,
@@ -15,27 +16,17 @@ import {
 	User as UserIcon,
 } from "lucide-react";
 
-// Mock data for demonstration
-const mockUser: User = {
-	id: "1",
-	username: "john_doe",
-	email: "john@example.com",
-	role: "user",
-	createdAt: new Date("2024-01-01"),
-	reputation: 1250,
-};
-
 const mockNotifications: Notification[] = [];
 
 export default function QuestionDetailPage() {
 	const params = useParams();
 	const questionId = params.id as string;
+	const { user: currentUser } = useAuth();
 
 	const [question, setQuestion] = useState<Question | null>(null);
 	const [answers, setAnswers] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingAnswers, setIsLoadingAnswers] = useState(true);
-	const [currentUser] = useState<User | undefined>(mockUser);
 	const [notifications] = useState<Notification[]>(mockNotifications);
 	const [newAnswer, setNewAnswer] = useState("");
 

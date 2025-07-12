@@ -303,3 +303,69 @@ export const searchApi = {
 		}>(`/api/search?${searchParams.toString()}`);
 	},
 };
+
+// Authentication API
+export const authApi = {
+	// Login user
+	login: async (
+		email: string,
+		password: string
+	): Promise<{ user: User; token: string }> => {
+		const response = await fetch("/api/auth/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ email, password }),
+		});
+
+		const data = await response.json();
+		if (!response.ok) throw new Error(data.message || "Login failed");
+
+		return data.data;
+	},
+
+	// Logout user
+	logout: async (): Promise<void> => {
+		const response = await fetch("/api/auth/logout", {
+			method: "POST",
+		});
+
+		if (!response.ok) {
+			const data = await response.json();
+			throw new Error(data.message || "Logout failed");
+		}
+	},
+
+	// Get current user
+	getCurrentUser: async (): Promise<User | null> => {
+		const response = await fetch("/api/auth/me");
+		if (!response.ok) {
+			return null;
+		}
+
+		const data = await response.json();
+		if (!data.success) {
+			return null;
+		}
+
+		return transformId(data.data);
+	},
+
+	// Register user
+	register: async (userData: {
+		username: string;
+		email: string;
+		password: string;
+	}): Promise<User> => {
+		const response = await fetch("/api/users", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(userData),
+		});
+
+		const data = await response.json();
+		if (!response.ok)
+			throw new Error(data.message || "Registration failed");
+
+		return transformId(data.data);
+	},
+};

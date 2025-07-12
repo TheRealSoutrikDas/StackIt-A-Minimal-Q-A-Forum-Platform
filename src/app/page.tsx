@@ -7,20 +7,12 @@ import AskQuestionForm from "@/components/forms/AskQuestionForm";
 import { Question, User, Tag, Notification } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { questionsApi, tagsApi } from "@/lib/api-client";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 import "./globals.css";
 
-// Mock data for demonstration (will be replaced with API calls)
-const mockUser: User = {
-	id: "1",
-	username: "john_doe",
-	email: "john@example.com",
-	role: "user",
-	createdAt: new Date("2024-01-01"),
-	reputation: 1250,
-};
-
+// Mock notifications for demonstration (will be replaced with API calls)
 const mockNotifications: Notification[] = [
 	{
 		id: "1",
@@ -45,11 +37,11 @@ const mockNotifications: Notification[] = [
 ];
 
 export default function HomePage() {
+	const { user: currentUser, loading: authLoading } = useAuth();
 	const [questions, setQuestions] = useState<Question[]>([]);
 	const [availableTags, setAvailableTags] = useState<Tag[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [showAskForm, setShowAskForm] = useState(false);
-	const [currentUser] = useState<User | undefined>(mockUser);
 	const [notifications, setNotifications] =
 		useState<Notification[]>(mockNotifications);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -162,7 +154,7 @@ export default function HomePage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<Navigation
-					user={currentUser}
+					user={currentUser || undefined}
 					notifications={notifications}
 					onSearch={handleSearch}
 					onNotificationClick={handleNotificationClick}
@@ -176,7 +168,7 @@ export default function HomePage() {
 		<div className="min-h-screen bg-background text-foreground">
 			{/* Navigation */}
 			<Navigation
-				user={currentUser}
+				user={currentUser || undefined}
 				notifications={notifications}
 				onSearch={handleSearch}
 				onNotificationClick={handleNotificationClick}
@@ -230,7 +222,7 @@ export default function HomePage() {
 								<QuestionCard
 									key={question.id}
 									question={question}
-									currentUser={currentUser}
+									currentUser={currentUser || undefined}
 									onVote={handleVote}
 									onQuestionClick={handleQuestionClick}
 								/>
