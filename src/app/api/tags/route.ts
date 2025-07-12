@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 		const skip = (page - 1) * limit;
 
 		// Build filter object
-		const filter: any = {};
+		const filter: Record<string, unknown> = {};
 		if (search) {
 			filter.$or = [
 				{ name: { $regex: search, $options: "i" } },

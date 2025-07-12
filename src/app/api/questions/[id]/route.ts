@@ -1,19 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import { Question } from "@/models/Question";
-import { Tag } from "@/models/Tag";
-import { User } from "@/models/Users";
-import { createQuestionSchema } from "@/schemas/questionSchema";
+import { Answer } from "@/models/Answer";
+import { z } from "zod";
+
+const updateQuestionSchema = z.object({
+	title: z.string().min(5).max(200),
+	description: z.string().min(10),
+	tags: z.array(z.string()).min(1).max(5),
+});
 
 // GET /api/questions/[id] - Get a specific question by ID
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json(
@@ -25,15 +30,19 @@ export async function GET(
 			);
 		}
 
+		// Increment view count
+		await Question.findByIdAndUpdate(id, { $inc: { views: 1 } });
+
 		const question = await Question.findById(id)
 			.populate("author", "username reputation")
-			.populate("tags", "name")
+			.populate("tags", "name color")
 			.populate({
 				path: "answers",
 				populate: {
 					path: "author",
 					select: "username reputation",
 				},
+				options: { sort: { votes: -1, createdAt: 1 } },
 			})
 			.lean();
 
@@ -46,9 +55,6 @@ export async function GET(
 				{ status: 404 }
 			);
 		}
-
-		// Increment view count
-		await Question.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
 		return NextResponse.json({
 			success: true,
@@ -70,12 +76,12 @@ export async function GET(
 // PUT /api/questions/[id] - Update a question
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 		const body = await request.json();
 
 		if (!id) {
@@ -89,7 +95,7 @@ export async function PUT(
 		}
 
 		// Validate request body
-		const validationResult = createQuestionSchema.safeParse(body);
+		const validationResult = updateQuestionSchema.safeParse(body);
 		if (!validationResult.success) {
 			return NextResponse.json(
 				{
@@ -118,31 +124,21 @@ export async function PUT(
 		// TODO: Check if user is authorized to edit this question
 		// For now, we'll allow editing (should check if current user is the author)
 
-		// Process tags - create if they don't exist
-		const tagIds = [];
-		for (const tagName of tags) {
-			let tag = await Tag.findOne({ name: tagName.toLowerCase() });
-			if (!tag) {
-				tag = await Tag.create({
-					name: tagName.toLowerCase(),
-					description: `Tag for ${tagName}`,
-				});
-			}
-			tagIds.push(tag._id);
-		}
-
 		// Update the question
 		const updatedQuestion = await Question.findByIdAndUpdate(
 			id,
-			{
-				title,
-				description,
-				tags: tagIds,
-			},
+			{ title, description, tags },
 			{ new: true }
 		)
 			.populate("author", "username reputation")
-			.populate("tags", "name")
+			.populate("tags", "name color")
+			.populate({
+				path: "answers",
+				populate: {
+					path: "author",
+					select: "username reputation",
+				},
+			})
 			.lean();
 
 		return NextResponse.json({
@@ -166,12 +162,12 @@ export async function PUT(
 // DELETE /api/questions/[id] - Delete a question
 export async function DELETE(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json(
@@ -197,6 +193,9 @@ export async function DELETE(
 
 		// TODO: Check if user is authorized to delete this question
 		// For now, we'll allow deletion (should check if current user is the author or admin)
+
+		// Delete all answers associated with this question
+		await Answer.deleteMany({ question: id });
 
 		// Delete the question
 		await Question.findByIdAndDelete(id);

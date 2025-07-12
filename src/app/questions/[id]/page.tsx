@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
-import { Question, User, Notification } from "@/lib/types";
+import { Question, Notification, Answer } from "@/lib/types";
 import { questionsApi, answersApi } from "@/lib/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default function QuestionDetailPage() {
 	const { user: currentUser } = useAuth();
 
 	const [question, setQuestion] = useState<Question | null>(null);
-	const [answers, setAnswers] = useState<any[]>([]);
+	const [answers, setAnswers] = useState<Answer[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingAnswers, setIsLoadingAnswers] = useState(true);
 	const [notifications] = useState<Notification[]>(mockNotifications);
@@ -180,7 +180,7 @@ export default function QuestionDetailPage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<Navigation
-					user={currentUser}
+					user={currentUser || undefined}
 					notifications={notifications}
 					onSearch={handleSearch}
 					onNotificationClick={handleNotificationClick}
@@ -198,7 +198,7 @@ export default function QuestionDetailPage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<Navigation
-					user={currentUser}
+					user={currentUser || undefined}
 					notifications={notifications}
 					onSearch={handleSearch}
 					onNotificationClick={handleNotificationClick}
@@ -217,7 +217,7 @@ export default function QuestionDetailPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<Navigation
-				user={currentUser}
+				user={currentUser || undefined}
 				notifications={notifications}
 				onSearch={handleSearch}
 				onNotificationClick={handleNotificationClick}

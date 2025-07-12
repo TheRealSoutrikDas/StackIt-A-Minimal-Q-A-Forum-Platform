@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
 	success: boolean;
 	message: string;
 	data?: T;
 	error?: string;
-	errors?: any[];
+	errors?: unknown[];
 	pagination?: {
 		page: number;
 		limit: number;
@@ -16,9 +16,9 @@ export interface ApiResponse<T = any> {
 
 export class ApiError extends Error {
 	statusCode: number;
-	errors?: any[];
+	errors?: unknown[];
 
-	constructor(message: string, statusCode: number = 500, errors?: any[]) {
+	constructor(message: string, statusCode: number = 500, errors?: unknown[]) {
 		super(message);
 		this.statusCode = statusCode;
 		this.errors = errors;
@@ -45,7 +45,7 @@ export function errorResponse(
 	message: string,
 	statusCode: number = 500,
 	error?: string,
-	errors?: any[]
+	errors?: unknown[]
 ): NextResponse<ApiResponse> {
 	return NextResponse.json(
 		{

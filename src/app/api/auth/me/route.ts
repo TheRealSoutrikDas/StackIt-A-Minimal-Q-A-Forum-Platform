@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		const decoded = jwt.verify(token, jwtSecret) as any;
+		const decoded = jwt.verify(token, jwtSecret) as { userId: string };
 		const userId = decoded.userId;
 
 		// Find the user

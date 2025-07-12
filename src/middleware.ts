@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
 
 			// Token is valid, redirect to home
 			return NextResponse.redirect(new URL("/", request.url));
-		} catch (error) {
+		} catch {
 			// Token is invalid, clear it and continue to auth page
 			const response = NextResponse.next();
 			response.cookies.set("auth-token", "", {
@@ -54,7 +54,6 @@ export async function middleware(request: NextRequest) {
 	if (pathname.startsWith("/api/") && !pathname.startsWith("/api/auth/")) {
 		// Skip authentication for public API routes
 		const publicApiRoutes = [
-			"/api/questions",
 			"/api/tags",
 			"/api/search",
 			"/api/test",
@@ -65,20 +64,20 @@ export async function middleware(request: NextRequest) {
 		const isUserRegistration =
 			pathname === "/api/users" && request.method === "POST";
 
+		// Allow GET requests to questions without authentication (for viewing)
+		const isPublicQuestionGet =
+			pathname === "/api/questions" && request.method === "GET";
+
 		const isPublicApiRoute = publicApiRoutes.some(
 			(route) => pathname === route || pathname.startsWith(route + "/")
 		);
 
-		// Debug logging
-		console.log("Middleware check:", {
-			pathname,
-			method: request.method,
-			isUserRegistration,
-			isPublicApiRoute,
-			hasToken: !!token,
-		});
-
-		if (!isPublicApiRoute && !isUserRegistration && !token) {
+		if (
+			!isPublicApiRoute &&
+			!isUserRegistration &&
+			!isPublicQuestionGet &&
+			!token
+		) {
 			return NextResponse.json(
 				{
 					success: false,

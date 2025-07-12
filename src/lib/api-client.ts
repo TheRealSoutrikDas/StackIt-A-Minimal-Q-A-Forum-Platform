@@ -1,12 +1,12 @@
 // API Client for interacting with backend endpoints
 import type { Question, Answer, User, Tag } from "@/lib/types";
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
 	success: boolean;
 	message: string;
 	data?: T;
 	error?: string;
-	errors?: any[];
+	errors?: { path: string[]; message: string }[];
 	pagination?: {
 		page: number;
 		limit: number;
@@ -19,7 +19,7 @@ export interface ApiResponse<T = any> {
 export type { Question, Answer, User, Tag } from "@/lib/types";
 
 // Transform MongoDB _id to id for frontend compatibility
-function transformId(obj: any): any {
+function transformId(obj: unknown): unknown {
 	if (obj === null || obj === undefined) return obj;
 
 	if (Array.isArray(obj)) {
@@ -27,7 +27,7 @@ function transformId(obj: any): any {
 	}
 
 	if (typeof obj === "object") {
-		const transformed: any = {};
+		const transformed: Record<string, unknown> = {};
 		for (const [key, value] of Object.entries(obj)) {
 			if (key === "_id") {
 				transformed.id = value;
@@ -347,7 +347,7 @@ export const authApi = {
 			return null;
 		}
 
-		return transformId(data.data);
+		return transformId(data.data) as User | null;
 	},
 
 	// Register user
@@ -355,7 +355,7 @@ export const authApi = {
 		username: string;
 		email: string;
 		password: string;
-	}): Promise<User> => {
+	}): Promise<User | null> => {
 		const response = await fetch("/api/users", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -366,6 +366,6 @@ export const authApi = {
 		if (!response.ok)
 			throw new Error(data.message || "Registration failed");
 
-		return transformId(data.data);
+		return transformId(data.data) as User | null;
 	},
 };

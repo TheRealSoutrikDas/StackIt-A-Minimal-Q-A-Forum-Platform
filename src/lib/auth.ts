@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import type { User } from "@/lib/types";
+import jwt from "jsonwebtoken";
 
 export interface JWTPayload {
 	userId: string;
@@ -28,8 +29,8 @@ export async function getUserFromRequest(
 		// You should implement proper JWT verification here
 
 		return null; // Placeholder - implement proper JWT verification
-	} catch (error) {
-		console.error("Error getting user from request:", error);
+	} catch {
+		console.error("Error getting user from request");
 		return null;
 	}
 }
@@ -37,11 +38,13 @@ export async function getUserFromRequest(
 // Verify JWT token
 export function verifyToken(token: string): JWTPayload | null {
 	try {
-		// This is a placeholder - implement proper JWT verification
-		// In production, use a proper JWT library like 'jsonwebtoken' or 'jose'
-		return null;
-	} catch (error) {
-		console.error("Error verifying token:", error);
+		const jwtSecret = process.env.JWT_SECRET;
+		if (!jwtSecret) return null;
+
+		const decoded = jwt.verify(token, jwtSecret) as JWTPayload;
+		return decoded;
+	} catch {
+		console.error("Error verifying token");
 		return null;
 	}
 }

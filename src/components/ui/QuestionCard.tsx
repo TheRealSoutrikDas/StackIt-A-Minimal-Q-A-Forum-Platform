@@ -8,6 +8,7 @@ import {
 	Eye,
 	Clock,
 	User,
+	CheckCircle,
 } from "lucide-react";
 import { Question, User as UserType } from "@/lib/types";
 import {
@@ -19,6 +20,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "./card";
+import { Badge } from "./badge";
+import { Button } from "./button";
 
 interface QuestionCardProps {
 	question: Question;
@@ -61,104 +64,108 @@ export default function QuestionCard({
 	};
 
 	return (
-		// <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-		//   <div className="flex gap-4">
-		//     {/* Vote Section */}
-		//     <div className="flex flex-col items-center space-y-2">
-		//       <button
-		//         onClick={() => handleVote(1)}
-		//         disabled={!currentUser}
-		//         className={`p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed ${
-		//           userVote === 1 ? 'text-green-600' : 'text-gray-400'
-		//         }`}
-		//       >
-		//         <ThumbsUp className="w-5 h-5" />
-		//       </button>
-		//       <span className="text-lg font-semibold text-gray-700">{question.votes}</span>
-		//       <button
-		//         onClick={() => handleVote(-1)}
-		//         disabled={!currentUser}
-		//         className={`p-1 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed ${
-		//           userVote === -1 ? 'text-red-600' : 'text-gray-400'
-		//         }`}
-		//       >
-		//         <ThumbsDown className="w-5 h-5" />
-		//       </button>
-		//     </div>
+		<Card
+			className="hover:shadow-md transition-shadow cursor-pointer"
+			onClick={() => onQuestionClick?.(question.id)}
+		>
+			<CardHeader>
+				<div className="flex items-start justify-between gap-4">
+					<div className="flex-1 min-w-0">
+						<CardTitle className="text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2">
+							{question.title}
+						</CardTitle>
+						<CardDescription className="mt-2 text-gray-600 line-clamp-3">
+							{truncateText(
+								question.description.replace(/<[^>]*>/g, ""),
+								200
+							)}
+						</CardDescription>
+					</div>
 
-		//     {/* Question Content */}
-		//     <div className="flex-1 min-w-0">
-		//       {/* Title */}
-		//       <h3
-		//         className="text-lg font-semibold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer line-clamp-2"
-		//         onClick={() => onQuestionClick?.(question.id)}
-		//       >
-		//         {question.title}
-		//       </h3>
+					{/* Vote Section */}
+					<CardAction className="flex flex-col items-center space-y-2">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={(e) => {
+								e.stopPropagation();
+								handleVote(1);
+							}}
+							disabled={!currentUser}
+							className={`p-1 h-auto disabled:opacity-50 disabled:cursor-not-allowed ${
+								userVote === 1
+									? "text-green-600"
+									: "text-gray-400"
+							}`}
+						>
+							<ThumbsUp className="w-5 h-5" />
+						</Button>
+						<span className="text-lg font-semibold text-gray-700">
+							{question.votes}
+						</span>
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={(e) => {
+								e.stopPropagation();
+								handleVote(-1);
+							}}
+							disabled={!currentUser}
+							className={`p-1 h-auto disabled:opacity-50 disabled:cursor-not-allowed ${
+								userVote === -1
+									? "text-red-600"
+									: "text-gray-400"
+							}`}
+						>
+							<ThumbsDown className="w-5 h-5" />
+						</Button>
+					</CardAction>
+				</div>
+			</CardHeader>
 
-		//       {/* Description */}
-		//       <p className="text-gray-600 mb-4 line-clamp-3">
-		//         {truncateText(question.description.replace(/<[^>]*>/g, ''), 200)}
-		//       </p>
+			<CardContent>
+				{/* Tags */}
+				<div className="flex flex-wrap gap-2 mb-4">
+					{question.tags.map((tag) => (
+						<Badge
+							key={tag.id}
+							variant="secondary"
+							className="text-xs"
+						>
+							{tag.name}
+						</Badge>
+					))}
+				</div>
+			</CardContent>
 
-		//       {/* Tags */}
-		//       <div className="flex flex-wrap gap-2 mb-4">
-		//         {question.tags.map((tag) => (
-		//           <span
-		//             key={tag.id}
-		//             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-		//           >
-		//             {tag.name}
-		//           </span>
-		//         ))}
-		//       </div>
+			<CardFooter className="flex items-center justify-between text-sm text-gray-500">
+				<div className="flex items-center space-x-4">
+					<div className="flex items-center space-x-1">
+						<User className="w-4 h-4" />
+						<span>{question.author.username}</span>
+					</div>
+					<div className="flex items-center space-x-1">
+						<Clock className="w-4 h-4" />
+						<span>{formatDate(question.createdAt)}</span>
+					</div>
+					<div className="flex items-center space-x-1">
+						<MessageCircle className="w-4 h-4" />
+						<span>{question.answers.length} answers</span>
+					</div>
+					<div className="flex items-center space-x-1">
+						<Eye className="w-4 h-4" />
+						<span>{question.views} views</span>
+					</div>
+				</div>
 
-		//       {/* Meta Information */}
-		//       <div className="flex items-center justify-between text-sm text-gray-500">
-		//         <div className="flex items-center space-x-4">
-		//           <div className="flex items-center space-x-1">
-		//             <User className="w-4 h-4" />
-		//             <span>{question.author.username}</span>
-		//           </div>
-		//           <div className="flex items-center space-x-1">
-		//             <Clock className="w-4 h-4" />
-		//             <span>{formatDate(question.createdAt)}</span>
-		//           </div>
-		//           <div className="flex items-center space-x-1">
-		//             <MessageCircle className="w-4 h-4" />
-		//             <span>{question.answers.length} answers</span>
-		//           </div>
-		//           <div className="flex items-center space-x-1">
-		//             <Eye className="w-4 h-4" />
-		//             <span>{question.views} views</span>
-		//           </div>
-		//         </div>
-
-		//         {/* Accepted Answer Badge */}
-		//         {question.acceptedAnswerId && (
-		//           <div className="flex items-center space-x-1 text-green-600">
-		//             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-		//             <span className="text-xs font-medium">Solved</span>
-		//           </div>
-		//         )}
-		//       </div>
-		//     </div>
-		//   </div>
-		// </div>
-		<div className="w-full p-4">
-			<Card>
-				<CardHeader>
-					<CardTitle>Card Title</CardTitle>
-					<CardDescription>Card Description</CardDescription>
-					<CardAction>Card Action</CardAction>
-				</CardHeader>
-				<CardContent>
-					<p>Card Content</p>
-				</CardContent>
-				<CardFooter>
-					<p>Card Footer</p>
-				</CardFooter>
-			</Card>
-		</div>
+				{/* Accepted Answer Badge */}
+				{question.acceptedAnswerId && (
+					<div className="flex items-center space-x-1 text-green-600">
+						<CheckCircle className="w-4 h-4" />
+						<span className="text-xs font-medium">Solved</span>
+					</div>
+				)}
+			</CardFooter>
+		</Card>
 	);
 }
