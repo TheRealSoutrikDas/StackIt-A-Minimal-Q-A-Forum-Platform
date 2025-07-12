@@ -2,21 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import { Question } from "@/models/Question";
 import { Answer } from "@/models/Answer";
-import { z } from "zod";
+import { verifyToken } from "@/lib/utils";
 
-const acceptAnswerSchema = z.object({
-	answerId: z.string(),
-});
-
-// POST /api/questions/[id]/accept-answer - Accept an answer as the best answer
+// POST /api/questions/[id]/accept-answer - Accept an answer for a question
 export async function POST(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 		const body = await request.json();
 
 		if (!id) {
@@ -29,22 +25,44 @@ export async function POST(
 			);
 		}
 
-		// Validate request body
-		const validationResult = acceptAnswerSchema.safeParse(body);
-		if (!validationResult.success) {
+		const { answerId } = body;
+
+		if (!answerId) {
 			return NextResponse.json(
 				{
 					success: false,
-					message: "Invalid request data",
-					errors: validationResult.error.issues,
+					message: "Answer ID is required",
 				},
 				{ status: 400 }
 			);
 		}
 
-		const { answerId } = validationResult.data;
+		// Get current user from token
+		const token = request.cookies.get("token")?.value;
+		if (!token) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Authentication required",
+				},
+				{ status: 401 }
+			);
+		}
 
-		// Check if question exists
+		const decoded = verifyToken(token);
+		if (!decoded) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Invalid token",
+				},
+				{ status: 401 }
+			);
+		}
+
+		const userId = decoded.userId;
+
+		// Check if question exists and user is the author
 		const question = await Question.findById(id);
 		if (!question) {
 			return NextResponse.json(
@@ -53,6 +71,17 @@ export async function POST(
 					message: "Question not found",
 				},
 				{ status: 404 }
+			);
+		}
+
+		// Check if user is the question author
+		if (question.author.toString() !== userId) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Only the question author can accept answers",
+				},
+				{ status: 403 }
 			);
 		}
 
@@ -78,30 +107,19 @@ export async function POST(
 			);
 		}
 
-		// TODO: Check if user is authorized to accept answers
-		// For now, we'll allow accepting (should check if current user is the question author)
+		// Update question to accept this answer
+		await Question.findByIdAndUpdate(id, {
+			acceptedAnswerId: answerId,
+		});
 
-		// Update the question to mark this answer as accepted
-		const updatedQuestion = await Question.findByIdAndUpdate(
-			id,
-			{ acceptedAnswer: answerId },
-			{ new: true }
-		)
-			.populate("author", "username reputation")
-			.populate("tags", "name")
-			.populate({
-				path: "answers",
-				populate: {
-					path: "author",
-					select: "username reputation",
-				},
-			})
-			.lean();
+		// Update answer to mark it as accepted
+		await Answer.findByIdAndUpdate(answerId, {
+			isAccepted: true,
+		});
 
 		return NextResponse.json({
 			success: true,
 			message: "Answer accepted successfully",
-			data: updatedQuestion,
 		});
 	} catch (error) {
 		console.error("Error accepting answer:", error);

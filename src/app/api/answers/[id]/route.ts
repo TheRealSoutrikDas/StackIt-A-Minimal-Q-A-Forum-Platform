@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import { Answer } from "@/models/Answer";
 import { Question } from "@/models/Question";
-import { User } from "@/models/Users";
 import { z } from "zod";
 
 const updateAnswerSchema = z.object({
@@ -12,12 +11,12 @@ const updateAnswerSchema = z.object({
 // GET /api/answers/[id] - Get a specific answer by ID
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json(
@@ -64,12 +63,12 @@ export async function GET(
 // PUT /api/answers/[id] - Update an answer
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 		const body = await request.json();
 
 		if (!id) {
@@ -143,12 +142,12 @@ export async function PUT(
 // DELETE /api/answers/[id] - Delete an answer
 export async function DELETE(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
 		await dbConnect();
 
-		const { id } = params;
+		const { id } = await params;
 
 		if (!id) {
 			return NextResponse.json(

@@ -4,6 +4,7 @@ import { Answer } from "@/models/Answer";
 import { Question } from "@/models/Question";
 import { User } from "@/models/Users";
 import { createAnswerSchema } from "@/schemas/answerSchema";
+import jwt from "jsonwebtoken";
 
 // GET /api/answers - Get all answers with pagination and filtering
 export async function GET(request: NextRequest) {
@@ -18,10 +19,10 @@ export async function GET(request: NextRequest) {
 		const sortOrder = searchParams.get("sortOrder") || "desc";
 
 		const skip = (page - 1) * limit;
-		const sort: any = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+		const sort = { [sortBy]: sortOrder === "desc" ? -1 : 1 } as const;
 
 		// Build filter object
-		const filter: any = {};
+		const filter: { question?: string } = {};
 		if (questionId) {
 			filter.question = questionId;
 		}
@@ -81,9 +82,33 @@ export async function POST(request: NextRequest) {
 
 		const { questionId, content } = validationResult.data;
 
-		// TODO: Get current user from session/auth
-		// For now, we'll use a placeholder user ID
-		const currentUserId = "507f1f77bcf86cd799439011"; // This should come from auth
+		// Get current user from JWT token
+		const token = request.cookies.get("auth-token")?.value;
+		if (!token) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Authentication required",
+				},
+				{ status: 401 }
+			);
+		}
+
+		// Verify the token and get user ID
+		const jwtSecret = process.env.JWT_SECRET;
+		if (!jwtSecret) {
+			console.error("JWT_SECRET not configured");
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Server configuration error",
+				},
+				{ status: 500 }
+			);
+		}
+
+		const decoded = jwt.verify(token, jwtSecret) as { userId: string };
+		const currentUserId = decoded.userId;
 
 		// Verify user exists
 		const user = await User.findById(currentUserId);

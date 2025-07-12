@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 import Navigation from "@/components/ui/Navigation";
 import QuestionCard from "@/components/ui/QuestionCard";
 import AskQuestionForm from "@/components/forms/AskQuestionForm";
-import { Question, User, Tag, Notification } from "@/lib/types";
+import { Question, Notification } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { questionsApi, tagsApi } from "@/lib/api-client";
+import { questionsApi } from "@/lib/api-client";
 import { useAuth } from "@/contexts/AuthContext";
-import Link from "next/link";
 
 import "./globals.css";
 
@@ -37,9 +36,8 @@ const mockNotifications: Notification[] = [
 ];
 
 export default function HomePage() {
-	const { user: currentUser, loading: authLoading } = useAuth();
+	const { user: currentUser } = useAuth();
 	const [questions, setQuestions] = useState<Question[]>([]);
-	const [availableTags, setAvailableTags] = useState<Tag[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [showAskForm, setShowAskForm] = useState(false);
 	const [notifications, setNotifications] =
@@ -80,12 +78,6 @@ export default function HomePage() {
 					if (questionsResponse.pagination) {
 						setTotalPages(questionsResponse.pagination.pages);
 					}
-				}
-
-				// Fetch tags
-				const tagsResponse = await tagsApi.getTags({ limit: 100 });
-				if (tagsResponse.success && tagsResponse.data) {
-					setAvailableTags(tagsResponse.data);
 				}
 			} catch (error) {
 				console.error("Error fetching data:", error);

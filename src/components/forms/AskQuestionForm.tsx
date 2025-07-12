@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import RichTextEditor from "@/components/editor/RichTextEditor";
-import TiptapEditor from "@/components/editor/TiptapEditor";
 import TagInput from "@/components/forms/TagInput";
 import { Button } from "@/components/ui/button";
 import { questionsApi, tagsApi } from "@/lib/api-client";
@@ -100,12 +99,14 @@ export default function AskQuestionForm({ onCancel }: AskQuestionFormProps) {
 			} else {
 				// Handle API errors
 				if (response.errors) {
-					const newErrors: any = {};
-					response.errors.forEach((error: any) => {
-						if (error.path) {
-							newErrors[error.path[0]] = error.message;
+					const newErrors: Record<string, string> = {};
+					response.errors.forEach(
+						(error: { path: string[]; message: string }) => {
+							if (error.path) {
+								newErrors[error.path[0]] = error.message;
+							}
 						}
-					});
+					);
 					setErrors(newErrors);
 				}
 			}
